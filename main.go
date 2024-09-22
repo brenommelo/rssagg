@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 )
 
@@ -22,6 +23,22 @@ func main() {
 	fmt.Println("PORT", portString)
 
 	router := chi.NewRouter()
+
+	router.Use(
+		cors.Handler(cors.Options{
+			AllowedOrigins:   []string{"https://*", "http://*"},
+			AllowedMethods:   []string{"GET", "PUT", "POST", "DELETE", "OPTIONS"},
+			AllowedHeaders:   []string{"*"},
+			ExposedHeaders:   []string{"Link"},
+			AllowCredentials: false,
+			MaxAge:           300,
+		},
+		))
+
+	v1Router := chi.NewRouter()
+	v1Router.Get("/healthz", hadlerReadiness)
+	v1Router.Get("/err", hadlerErr)
+	router.Mount("/v1", v1Router) //esta aninhando ready no v1 path
 
 	srv := &http.Server{
 		Handler: router,
