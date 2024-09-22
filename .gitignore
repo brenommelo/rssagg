@@ -1,2 +1,4 @@
 rssagg
 *.exe
+.env
+thunder-tests/
