@@ -59,6 +59,8 @@ func main() {
 	v1Router.Get("/healthz", hadlerReadiness)
 	v1Router.Get("/err", hadlerErr)
 	v1Router.Post("/users", apiCfg.handlerUsersCreate)
+	v1Router.Get("/users", apiCfg.handlerGetUsers)
+
 	router.Mount("/v1", v1Router) //esta aninhando ready no v1 path
 
 	srv := &http.Server{
