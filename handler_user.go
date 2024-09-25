@@ -2,11 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/brenommelo/rssagg/internal/auth"
 	"github.com/brenommelo/rssagg/internal/database"
 	"github.com/google/uuid"
 )
@@ -37,17 +35,6 @@ func (cfg *apiConfig) handlerUsersCreate(w http.ResponseWriter, r *http.Request)
 	respondWithJSON(w, http.StatusOK, databaseUserToUser(user))
 }
 
-func (cfg *apiConfig) handlerGetUsers(w http.ResponseWriter, r *http.Request) {
-	apiKey, err := auth.GetAPIKey(r.Header)
-
-	if err != nil {
-		respondWithError(w, 403, fmt.Sprintf("Auth error: %v", err))
-		return
-	}
-	user, err := cfg.DB.GetUserByAPIKey(r.Context(), apiKey)
-	if err != nil {
-		respondWithError(w, 400, "User not fount")
-		return
-	}
+func (cfg *apiConfig) handlerUsersGet(w http.ResponseWriter, r *http.Request, user database.User) {
 	respondWithJSON(w, http.StatusOK, databaseUserToUser(user))
 }

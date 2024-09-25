@@ -58,8 +58,15 @@ func main() {
 	v1Router := chi.NewRouter()
 	v1Router.Get("/healthz", hadlerReadiness)
 	v1Router.Get("/err", hadlerErr)
+
 	v1Router.Post("/users", apiCfg.handlerUsersCreate)
-	v1Router.Get("/users", apiCfg.handlerGetUsers)
+	v1Router.Get("/users", apiCfg.middlewareAuth(apiCfg.handlerUsersGet))
+
+	v1Router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerFeedCreate))
+	v1Router.Get("/feeds", apiCfg.handlerGetFeeds)
+	v1Router.Get("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowsGet))
+	v1Router.Post("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowCreate))
+	v1Router.Delete("/feed_follows/{feedFollowID}", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowDelete))
 
 	router.Mount("/v1", v1Router) //esta aninhando ready no v1 path
 
@@ -68,7 +75,7 @@ func main() {
 		Addr:    ":" + portString,
 	}
 
-	log.Printf("Server starting on port: ", portString)
+	log.Printf("Server starting on port: %v", portString)
 	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
